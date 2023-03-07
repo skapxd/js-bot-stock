@@ -1,4 +1,4 @@
 export const ENV = {
-  keyId: "PKLQB8VAT10BKJ55DMNP",
-  secretKey: "rJw7xm2Zx6sp3cMYUCjEtA9CDKrGVDdEzdUmqWL2",
+  keyId: process.env.KEY_ID,
+  secretKey: process.env.SECRET_KEY,
 }

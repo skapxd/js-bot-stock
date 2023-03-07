@@ -1,10 +1,5 @@
 import Alpaca from "@alpacahq/alpaca-trade-api";
-
-import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
-dotenv.config()
-
 import { ENV } from "./env.mjs";
-
 const API_KEY = ENV.keyId;
 const API_SECRET = ENV.secretKey
 const USE_POLYGON = false;  // by default we use the Alpaca data stream but you can change that
@@ -115,7 +110,7 @@ class LongShort {
   }
 
   async cancelExistingOrders () {
-    let orders
+    let orders = []
     try {
       orders = await this.alpaca.getOrders({
         status: 'open',
