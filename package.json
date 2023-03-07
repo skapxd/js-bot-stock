@@ -1,0 +1,22 @@
+{
+  "name": "js-stock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch index.mjs",
+    "start": "node index.mjs",
+    "dev:long-short": "node --watch long-short.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@alpacahq/alpaca-trade-api": "2.16.1",
+    "dotenv": "16.0.3"
+  },
+  "engines": {
+    "node": ">=18.13.0"
+  }
+}
