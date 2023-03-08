@@ -9,7 +9,7 @@ const SideType = { BUY: 'buy', SELL: 'sell' }
 const PositionType = { LONG: 'long', SHORT: 'short' }
 
 class LongShort {
-  constructor ({ keyId, secretKey, paper = true, bucketPct = 0.25 }) {
+  constructor({ keyId, secretKey, paper = true, bucketPct = 0.25 }) {
     this.alpaca = new Alpaca({
       keyId: keyId,
       secretKey: secretKey,
@@ -33,7 +33,7 @@ class LongShort {
     this.bucketPct = bucketPct
   }
 
-  async run () {
+  async run() {
     // First, cancel any existing orders so they don't impact our buying power.
     await this.cancelExistingOrders()
 
@@ -44,6 +44,10 @@ class LongShort {
 
     // Rebalance the portfolio every minute, making necessary trades.
     var spin = setInterval(async () => {
+
+      const resp = await this.alpaca.getAccount()
+      log(`Profit loss ${(Number(resp.equity) - 100_000).toFixed(2)} usd | Current equity ${resp.equity} | Init equity is 100.000`)
+
       // Figure out when the market will close so we can prepare to sell beforehand.
       try {
         let clock = await this.alpaca.getClock()
@@ -87,7 +91,7 @@ class LongShort {
   }
 
   // Spin until the market is open
-  async awaitMarketOpen () {
+  async awaitMarketOpen() {
     return new Promise(resolve => {
       const check = async () => {
         try {
@@ -109,7 +113,7 @@ class LongShort {
     })
   }
 
-  async cancelExistingOrders () {
+  async cancelExistingOrders() {
     let orders = []
     try {
       orders = await this.alpaca.getOrders({
@@ -133,7 +137,7 @@ class LongShort {
   }
 
   // Rebalance our position after an update.
-  async rebalance () {
+  async rebalance() {
     await this.rerank()
 
     // Clear existing orders again.
@@ -319,7 +323,7 @@ class LongShort {
   }
 
   // Re-rank all stocks to adjust longs and shorts.
-  async rerank () {
+  async rerank() {
     await this.rank()
 
 
@@ -359,7 +363,7 @@ class LongShort {
   }
 
   // Get the total price of the array of input stocks.
-  async getTotalPrice (stocks = []) {
+  async getTotalPrice(stocks = []) {
     return Promise.all(stocks.map(stock => {
       return new Promise(async (resolve) => {
         try {
@@ -368,18 +372,18 @@ class LongShort {
           if (this.alpaca.configuration.usePolygon) {
             const now = new Date().getTime();
             const resp = await this.alpaca.getHistoricAggregatesV2(stock,
-                1,
-                'minute',
-                // 60000 : minutes and in milliseconds
-                // 1+1: limit + 1, this will return exactly 1 sample
-                (now - (1+1) * 60000),
-                now,
-                {
-                  unadjusted: false,
-                });
+              1,
+              'minute',
+              // 60000 : minutes and in milliseconds
+              // 1+1: limit + 1, this will return exactly 1 sample
+              (now - (1 + 1) * 60000),
+              now,
+              {
+                unadjusted: false,
+              });
             const close = resp.results[0].c;
             resolve(close);
-          } else{
+          } else {
             const resp = await this.alpaca.getBarsV2(stock, {
               timeframe: '1Min',
               limit: 1,
@@ -395,7 +399,7 @@ class LongShort {
   }
 
   // Submit an order if quantity is above 0.
-  async submitOrder ({ quantity, stock, side }) {
+  async submitOrder({ quantity, stock, side }) {
     return new Promise(async (resolve) => {
       if (quantity <= 0) {
         log(`Quantity is <=0, order of | ${quantity} ${stock} ${side} | not sent.`)
@@ -421,7 +425,7 @@ class LongShort {
   }
 
   // Submit a batch order that returns completed and uncompleted orders.
-  async sendBatchOrder ({ quantity, stocks, side }) {
+  async sendBatchOrder({ quantity, stocks, side }) {
     return new Promise(async (resolve) => {
       let incomplete = []
       let executed = []
@@ -448,7 +452,7 @@ class LongShort {
 
   // Get percent changes of the stock prices over the past 10 minutes.
 
-  getPercentChanges (limit = 10) {
+  getPercentChanges(limit = 10) {
     return Promise.all(this.stockList.map(stock => {
       return new Promise(async (resolve) => {
         try {
@@ -457,15 +461,15 @@ class LongShort {
           if (this.alpaca.configuration.usePolygon) {
             const now = new Date().getTime();
             const resp = await this.alpaca.getHistoricAggregatesV2(stock.name,
-                1,
-                'minute',
-                // 60000 : minutes and in milliseconds
-                // 1+1: limit + 1, this will return exactly limit samples
-                (now - (limit+1) * 60000),
-                now,
-                {
-                  unadjusted: false,
-                });
+              1,
+              'minute',
+              // 60000 : minutes and in milliseconds
+              // 1+1: limit + 1, this will return exactly limit samples
+              (now - (limit + 1) * 60000),
+              now,
+              {
+                unadjusted: false,
+              });
             const l = resp.results.length;
             const last_close = resp.results[l - 1].c;
             const first_open = resp.results[0].o;
@@ -489,7 +493,7 @@ class LongShort {
   }
 
   // Mechanism used to rank the stocks, the basis of the Long-Short Equity Strategy.
-  async rank () {
+  async rank() {
     // Ranks all stocks by percent change over the past 10 minutes (higher is better).
     await this.getPercentChanges()
 
@@ -498,7 +502,7 @@ class LongShort {
   }
 }
 
-function log (text) {
+function log(text) {
   console.log(text)
 }
 
