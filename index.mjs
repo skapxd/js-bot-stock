@@ -47,9 +47,9 @@ class LongShort {
     var spin = setInterval(async () => {
 
       const resp = await this.alpaca.getAccount()
-      const profit = i18n.currency.format(parseFloat(resp.equity) - 100_000)
+      const profit = i18n.currency.format(parseFloat(resp.equity) - 1_000)
       const currentEquity = i18n.currency.format(parseFloat(resp.equity))
-      const initialEquity = i18n.currency.format(100_000)
+      const initialEquity = i18n.currency.format(1_000)
       log(`Profit ${profit} | Current equity ${currentEquity} | Init equity is ${initialEquity}}`)
 
       // Figure out when the market will close so we can prepare to sell beforehand.
