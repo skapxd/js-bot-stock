@@ -1,5 +1,6 @@
 import Alpaca from "@alpacahq/alpaca-trade-api";
 import { ENV } from "./env.mjs";
+import { i18n } from "./i18n.mjs";
 const API_KEY = ENV.keyId;
 const API_SECRET = ENV.secretKey
 const USE_POLYGON = false;  // by default we use the Alpaca data stream but you can change that
@@ -46,7 +47,10 @@ class LongShort {
     var spin = setInterval(async () => {
 
       const resp = await this.alpaca.getAccount()
-      log(`Profit loss ${(Number(resp.equity) - 100_000).toFixed(2)} usd | Current equity ${resp.equity} | Init equity is 100.000`)
+      const profit = i18n.currency.format(parseFloat(resp.equity) - 100_000)
+      const currentEquity = i18n.currency.format(parseFloat(resp.equity))
+      const initialEquity = i18n.currency.format(100_000)
+      log(`Profit ${profit} | Current equity ${currentEquity} | Init equity is ${initialEquity}}`)
 
       // Figure out when the market will close so we can prepare to sell beforehand.
       try {
